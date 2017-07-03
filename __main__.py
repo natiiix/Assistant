@@ -23,7 +23,10 @@ def plhldr():
     """This is a placeholder callback function"""
     synthesizer.speak("Expression recognized")
 
-EXPRESSIONS = [expression.Expression(plhldr, "hello", "hi", "good morning")]
+EXPRESSIONS = [
+    expression.Expression(exit, "exit", "quit"),
+    expression.Expression(plhldr, "hello", "hi", "good morning")
+]
 
 def process(text):
     """Function for processing the user input"""

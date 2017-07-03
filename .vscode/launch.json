@@ -9,14 +9,11 @@
             "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceRoot}/__main__.py",
             "cwd": "${workspaceRoot}",
-            "env": {},
-            "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
                 "WaitOnNormalExit",
                 "RedirectOutput"
-            ],
-            "internalConsoleOptions": "openOnSessionStart"
+            ]
         }
     ]
 }
