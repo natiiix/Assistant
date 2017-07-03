@@ -1,44 +1,48 @@
-# Simple cross-platform TTS (text-to-speech) module for Python 3
-# Uses pywin32 on Windows and eSpeak on Linux
+"""
+Simple cross-platform TTS (text-to-speech) module for Python 3
+Uses pywin32 on Windows and eSpeak on Linux
 
-# Installation of dependencies:
-# Windows: pip install pywin32
-# Linux: sudo apt-get install espeak
+Installation of dependencies:
+Windows: pip install pywin32
+Linux: sudo apt-get install espeak
+"""
 
 # Get name string of the host operating system
 import platform
-osname = platform.uname().system
+OSNAME = platform.uname().system
 
 # Host OS is Windows
-if osname == "Windows":
+if OSNAME == "Windows":
     # Import the Windows TTS module
     try:
         import win32com.client
     # TTS module is not present on the system
-    except ImportError as e:
+    except ImportError as ex:
         print("Unable to import Win32 module! Make sure pywin32 is installed on your system!")
-        print(e)
+        print(ex)
 
 # Host OS is Linux
-elif osname == "Linux":
+elif OSNAME == "Linux":
     # Import the Linux TTS module
     try:
         from espeak import espeak
     # TTS module is not present on the system
-    except ImportError as e:
+    except ImportError as ex:
         print("Unable to import eSpeak module! Make sure it is installed on your system!")
-        print(e)
+        print(ex)
 
 # Unknown host OS
 else:
     raise Exception("Unknown host operating system! Unable to import proper text-to-speech module!")
 
-# Reads the specified text string using the OS-specific TTS module
-# text: Text string to read
-# *args: Optional voice index argument (used by Windows TTS)
 def speak(text, *args):
+    """
+    Reads the specified text string using the OS-specific TTS module
+    text: Text string to read
+    *args: Optional voice index argument (used by Windows TTS)
+    """
     # Windows - pywin32 - SAPI
-    if osname == "Windows":
+    if OSNAME == "Windows":
         speaker = win32com.client.Dispatch("SAPI.SpVoice")
 
         # If the optional argument is specified
@@ -63,6 +67,6 @@ def speak(text, *args):
         speaker.Speak(text)
 
     # Linux - eSpeak
-    elif osname == "Linux":
+    elif OSNAME == "Linux":
         # Read the text string
         espeak.synth(text)
