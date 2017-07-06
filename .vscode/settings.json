@@ -11,7 +11,7 @@
         
         ".gitignore": true,
         "LICENSE": true,
-        "README.md": true,
+        //"README.md": true,
         "__pycache__": true        
     }
 }
