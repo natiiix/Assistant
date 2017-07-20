@@ -4,7 +4,7 @@ Uses pywin32 on Windows and eSpeak on Linux
 
 Installation of dependencies:
 Windows: pip install pywin32
-Linux: sudo apt-get install espeak
+Linux: sudo apt-get install espeak python3-espeak
 """
 
 # Get name string of the host operating system
