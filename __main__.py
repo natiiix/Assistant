@@ -15,34 +15,84 @@ to be successfully resolved. Otherwise the user is notified that
 the program was unable to resolve the last input.
 """
 
-import recognizer
-import synthesizer
-import expression
+import action_greeting
 
-def plhldr():
-    """This is a placeholder callback function"""
-    synthesizer.speak("Expression recognized")
+import recognizer as rec
+import synthesizer as synth
+import query
 
-EXPRESSIONS = [
-    expression.Expression(exit, "exit", "quit"),
-    expression.Expression(plhldr, "hello", "hi", "good morning")
-]
+QUERIES = (
+    query.Query(lambda: exit(0), False, "exit", "quit", "stop listening"),
+    query.Query(action_greeting.informal, False, "hello", "hi", "hey"),
+    query.Query(action_greeting.formal, True, "good morning", "good afternoon", "good evening"),
+    query.Query(lambda: synth.speak("you're welcome"), False, "thank you")
+)
+
+REDUNDANT_EXPRESSIONS = (
+    "please",
+    "could you",
+    "can you",
+    "would you",
+    " thank you" # only considered redundant when following another expression
+)
+
+def cleanup(text):
+    """This function cleans up the input string by removing all redundant expressions."""
+    cleaned = text
+
+    # Remove all the redundant expressions
+    for exp in REDUNDANT_EXPRESSIONS:
+        cleaned = cleaned.replace(exp, "")
+
+    # Count leading spaces
+    spaces_lead = 0
+    for char in cleaned:
+        if char == " ":
+            spaces_lead += 1
+        else:
+            break
+
+    # Count tailing spaces
+    spaces_tail = 0
+    strlen = len(cleaned)
+    for i in range(strlen):
+        if cleaned[strlen - 1 - i] == " ":
+            spaces_tail += 1
+        else:
+            break
+
+    # Return the cleaned up string without leading and trailing spaces
+    return cleaned[spaces_lead : -spaces_tail if spaces_tail else None]
 
 def process(text):
-    """Function for processing the user input"""
-    # Test the input string against the list of defined expressions
-    for exp in EXPRESSIONS:
-        # If the string matches the expression
-        if exp.compare(text):
-            # Call the function associated with the expression
-            exp.action()
+    """
+    This function iterates through all the queries and tries to find the one
+    that matches the user input string. If none of them match the input string
+    the user is informed that his input could not have been recognized.
+    """
+    # Clean up the input string
+    cleaned = cleanup(text)
 
-while True:
-    # Record audio, perform speech-to-text
-    TEXT = recognizer.listen()
-    # If the input string is not None
-    if TEXT:
-        # Print the input string
-        print(TEXT)
-        # Process the input string and call the assiciated function
-        process(TEXT)
+    # Iterate through the defined queries
+    for que in QUERIES:
+        # Stop when a match is found
+        if que.process(cleaned):
+            return
+
+    # No matching query found
+    synth.speak("I don't understand: " + text)
+
+def main():
+    """This is the main function of the script."""
+    while True:
+        # Record audio, perform speech-to-text
+        text = rec.listen()
+        # If the input string is not None
+        if text:
+            # Print the input string
+            print(text)
+            # Process the input string and call the assiciated function
+            process(text)
+
+if __name__ == "__main__":
+    main()
