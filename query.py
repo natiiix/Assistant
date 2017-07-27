@@ -13,22 +13,22 @@ class Query:
     # Determines if the input string is going to be passed to
     # the action function when process function finds a match.
     pass_input = None
-    # List of synonymous expressions that trigger the action function.
-    expressions = None
+    # Evaluation function
+    # Determines if the input expression corresponds to the query
+    evalfunc = None
 
-    def __init__(self, _action, _pass_input, *args):
+    def __init__(self, _action, _pass_input, _evalfunc):
         self.action = _action
         self.pass_input = _pass_input
-        self.expressions = args
+        self.evalfunc = _evalfunc
 
     def process(self, expr):
         """
-        This method compares the input string against the
-        list of synonymous expressions. If it matches one
-        of the expressions, the action fuction is called.
-        A boolean value representing the match is then returned.
+        This methods runs the input expression through the evaluation function
+        of this query. If the evaluation function returns true the action function is called.
+        Boolean value representing the result of the evaluation function is returned.
         """
-        if expr in self.expressions:
+        if self.evalfunc(expr):
             if self.pass_input:
                 self.action(expr)
             else:

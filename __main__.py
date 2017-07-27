@@ -15,17 +15,27 @@ to be successfully resolved. Otherwise the user is notified that
 the program was unable to resolve the last input.
 """
 
-import action_greeting
-
 import recognizer as rec
 import synthesizer as synth
 import query
+import action_greeting
+import action_define
 
 QUERIES = (
-    query.Query(lambda: exit(0), False, "exit", "quit", "stop listening"),
-    query.Query(action_greeting.informal, False, "hello", "hi", "hey"),
-    query.Query(action_greeting.formal, True, "good morning", "good afternoon", "good evening"),
-    query.Query(lambda: synth.speak("you're welcome"), False, "thank you")
+    query.Query(lambda: exit(0), False,
+                lambda x: x in ("exit", "quit", "stop listening")),
+
+    query.Query(action_greeting.informal, False,
+                lambda x: x in action_greeting.GREETINGS_INFORMAL),
+
+    query.Query(action_greeting.formal, True,
+                lambda x: x in ("good morning", "good afternoon", "good evening")),
+
+    query.Query(lambda: synth.speak("you're welcome"), False,
+                lambda x: x in ("thanks", "thank you")),
+
+    query.Query(action_define.define, True,
+                action_define.is_define_request)
 )
 
 REDUNDANT_EXPRESSIONS = (
@@ -33,16 +43,22 @@ REDUNDANT_EXPRESSIONS = (
     "could you",
     "can you",
     "would you",
-    " thank you" # only considered redundant when following another expression
+    "thank you", # only considered redundant when following another expression
+    "the",
+    "a",
+    "an"
 )
 
 def cleanup(text):
-    """This function cleans up the input string by removing all redundant expressions."""
-    cleaned = text
+    """
+    This function cleans up the input string by removing all redundant expressions.
+    The input string is also converted to lowercase for easier manipulation.
+    """
+    cleaned = text.lower()
 
     # Remove all the redundant expressions
     for exp in REDUNDANT_EXPRESSIONS:
-        cleaned = cleaned.replace(exp, "")
+        cleaned = cleaned.replace(exp + " ", "").replace(" " + exp, "")
 
     # Count leading spaces
     spaces_lead = 0

@@ -1,7 +1,7 @@
 """This module contains action functions that perform a greeting."""
 
 import random
-#import datetime
+import datetime
 import synthesizer as synth
 
 GREETINGS_INFORMAL = (
